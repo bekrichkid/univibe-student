@@ -1,8 +1,9 @@
+// src/components/Navbar.jsx
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { BsFillLightningChargeFill } from "react-icons/bs";
-// import { Link } from 'react-router-dom';
+import { logout } from "../../redux/slices/authSlice";
 
 const gradeColors = {
   Freshmen: "bg-blue-500",
@@ -47,26 +48,20 @@ const Navbar = ({ tokens }) => {
 
   return (
     <div className="bg-base-200 hidden md:flex navbar shadow-sm">
-      {/* Left */}
+      {/* Left: Search */}
       <div className="navbar-start">
-        <input
-          className="input input-md"
-          placeholder="Search"
-          type="text"
-        />
+        <input className="input input-md" placeholder="Search" type="text" />
       </div>
 
-     
       <div className="navbar-center"></div>
 
-     
+      {/* Right: Tokens & Avatar */}
       <div className="navbar-end">
         <div className="flex items-center mr-4 border border-primary py-2 px-5 rounded">
           <BsFillLightningChargeFill className="text-2xl text-amber-500 mr-2" />
           <span className="text-primary">{tokens}</span>
         </div>
 
-        
         <div className="dropdown dropdown-end">
           {user?.image && !imgError ? (
             <div
@@ -77,9 +72,16 @@ const Navbar = ({ tokens }) => {
               <div
                 className={`w-10 rounded-full ring ${gradeColor} ring-offset-2 ring-offset-base-100 transition-all`}
               >
+                {/* ✅ Cache busting bilan – profil tahriridan keyin yangi rasm ko‘rinadi */}
                 <img
-                  src={user.image}
-                  alt={`${user.name || "User"} ${user.surname || ""}`}
+                  src={
+                    user?.image
+                      ? `https://api.univibe.uz${user.image}?v=${
+                          user.image_updated_at || Date.now()
+                        }`
+                      : ""
+                  }
+                  alt={`${user?.name || "User"} ${user?.surname || ""}`}
                   onError={() => setImgError(true)}
                 />
               </div>
@@ -94,19 +96,24 @@ const Navbar = ({ tokens }) => {
             </div>
           )}
 
-         
           <ul
             tabIndex={0}
             className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-sm"
           >
-            <li><Link to={'/profile'}>Profile</Link></li>
-            <li><a>Settings</a></li>
-            <li><a>Logout</a></li>
+            <li>
+              <Link to="/profile">Profile</Link>
+            </li>
+            <li>
+              <Link to="#">Settings</Link>
+            </li>
+            <li>
+              <button onClick={handleLogoutClick}>Logout</button>
+            </li>
           </ul>
         </div>
       </div>
 
-     
+      {/* Logout modal */}
       <dialog
         id="logout_modal"
         className="modal"

@@ -12,14 +12,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Image editing states
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Profile Fetch
   const fetchProfile = async () => {
     try {
       const response = await axiosInstance.get("/api/v1/students/profile/");

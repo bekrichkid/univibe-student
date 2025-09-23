@@ -1,5 +1,6 @@
+// src/redux/slices/authSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchUserInfo } from './authThunk';
+import { fetchUserInfo } from "./authThunk";
 
 const initialState = {
   userInfo: null,
@@ -15,6 +16,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // === Login actions ===
     loginStart: (state) => {
       state.loading = true;
       state.error = null;
@@ -32,16 +34,20 @@ const authSlice = createSlice({
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("role", role);
-      localStorage.setItem("isAuthenticated", true);
+      localStorage.setItem("isAuthenticated", "true");
     },
     loginFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
     },
+
+    // === Token actions ===
     updateAccessToken: (state, action) => {
       state.accessToken = action.payload;
       localStorage.setItem("accessToken", action.payload);
     },
+
+    // === Auth restore (e.g. on page reload) ===
     restoreAuth: (state, action) => {
       state.userInfo = action.payload.userInfo;
       state.role = action.payload.role;
@@ -49,6 +55,8 @@ const authSlice = createSlice({
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
     },
+
+    // === Logout ===
     logout: (state) => {
       state.userInfo = null;
       state.role = null;
@@ -63,7 +71,20 @@ const authSlice = createSlice({
       localStorage.removeItem("refreshToken");
       localStorage.removeItem("role");
     },
+
+    // ✅ Yangi action – foydalanuvchi ma’lumotini (masalan rasmni) yangilash
+    updateUserInfo: (state, action) => {
+      // `userInfo` sizning loginSuccess’da qanday saqlanayotganiga qarab
+      // massiv bo‘lsa, uni ham shu formatda yangilash mumkin
+      if (Array.isArray(state.userInfo)) {
+        state.userInfo = [action.payload];
+      } else {
+        state.userInfo = action.payload;
+      }
+    },
   },
+
+  // === Async thunk lar ===
   extraReducers: (builder) => {
     builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
       state.userInfo = action.payload;
@@ -78,6 +99,7 @@ export const {
   updateAccessToken,
   restoreAuth,
   logout,
+  updateUserInfo, // ✅ eksport qilish
 } = authSlice.actions;
 
 export default authSlice.reducer;

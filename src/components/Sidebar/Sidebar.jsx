@@ -1,14 +1,10 @@
-
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { FaHome, FaUser, FaBook } from "react-icons/fa";
+import { FaHome, FaUser } from "react-icons/fa";
 import { FaBasketShopping } from "react-icons/fa6";
-import { MdGroups } from "react-icons/md";
+import { MdGroups, MdLeaderboard } from "react-icons/md";
 import { logout } from "../../redux/slices/authSlice";
-import { MdOutlineLeaderboard } from "react-icons/md";
-import { MdLeaderboard } from "react-icons/md";
-
 
 const gradeColors = {
   Freshmen: "bg-blue-500",
@@ -19,14 +15,19 @@ const gradeColors = {
 };
 
 const Sidebar = () => {
-  const user = useSelector((state) => state?.auth?.userInfo === null ? null : state?.auth?.userInfo[0]);
+  const user = useSelector((state) =>
+    state?.auth?.userInfo === null ? null : state?.auth?.userInfo[0]
+  );
   const [imgError, setImgError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const gradeName = user && user?.grade && user?.grade?.grade_name ? user?.grade?.grade_name : "Default";
+  const gradeName =
+    user && user?.grade && user?.grade?.grade_name
+      ? user?.grade?.grade_name
+      : "Default";
   const gradeColor = gradeColors[gradeName] || gradeColors.Default;
 
   const handleLogoutClick = () => {
@@ -54,31 +55,43 @@ const Sidebar = () => {
       path: "/shop",
       icon: <FaBasketShopping className="mr-2" />,
     },
-    { name: "Rating", path: "/rating", icon: <MdLeaderboard className="mr-2" /> },
+    {
+      name: "Rating",
+      path: "/rating",
+      icon: <MdLeaderboard className="mr-2" />,
+    },
     { name: "Profile", path: "/profile", icon: <FaUser className="mr-2" /> },
-
   ];
-
 
   return (
     <aside className="h-screen bg-base-200 p-4 shadow-lg border-r border-base-300">
       <nav className="flex flex-col h-full justify-between">
         <div>
-          <div onClick={() => navigate('/profile')} className="flex flex-col items-center mb-4">
+          {/* Avatar */}
+          <div
+            onClick={() => navigate("/profile")}
+            className="flex flex-col items-center mb-4"
+          >
             {user?.image && !imgError ? (
-              <div onClick={() => navigate('/profile')} className="avatar cursor-pointer">
+              <div className="avatar cursor-pointer">
                 <div
                   className={`w-24 rounded-full ring ${gradeColor} ring-offset-2 ring-offset-base-100 transition-all`}
                 >
                   <img
-                    src={user?.image}
+                    src={
+                      user?.image
+                        ? `https://api.univibe.uz${user.image}?v=${
+                            user.image_updated_at || Date.now()
+                          }`
+                        : ""
+                    }
                     alt={`${user?.name || "User"} ${user?.surname || ""}`}
                     onError={() => setImgError(true)}
                   />
                 </div>
               </div>
             ) : (
-              <div onClick={() => navigate('/profile')}
+              <div
                 className={`avatar avatar-placeholder cursor-pointer ${gradeColor} text-neutral-content rounded-full w-24 h-24`}
               >
                 <div className="w-full h-full text-3xl">
@@ -92,6 +105,7 @@ const Sidebar = () => {
             </p>
           </div>
 
+          {/* Links */}
           <ul className="space-y-2 mt-5">
             {links.map((link) => (
               <li key={link.name} className="group">
@@ -100,7 +114,7 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     `flex items-center px-3 py-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? `bg-neutral text-neutral-content shadow-md`
+                        ? "bg-neutral text-neutral-content shadow-md"
                         : "hover:bg-base-300"
                     }`
                   }
@@ -113,6 +127,7 @@ const Sidebar = () => {
           </ul>
         </div>
 
+        {/* Logout */}
         <div>
           <button
             className="btn btn-outline btn-error w-full"
@@ -123,7 +138,12 @@ const Sidebar = () => {
         </div>
       </nav>
 
-      <dialog id="logout_modal" className="modal" aria-label="Logout Confirmation">
+      {/* Logout modal */}
+      <dialog
+        id="logout_modal"
+        className="modal"
+        aria-label="Logout Confirmation"
+      >
         <div className="modal-box">
           <h3 className="font-bold text-lg">Confirm Logout</h3>
           <p className="py-4">Are you sure you want to log out?</p>
