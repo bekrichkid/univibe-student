@@ -111,8 +111,7 @@ const Dashboard = () => {
         className="bg-base-100 p-6 rounded-xl md:shadow-xl md:border 
   border-base-300 w-full max-w-[1200px] mx-auto mb-6"
       >
-        <h2 className="text-lg md:text-2xl font-semibold mb-4">Last Events</h2>
-        {/* height param bilan NewsBannerSwiper chaqiramiz */}
+        <h2 className="text-lg md:text-2xl font-semibold mb-4">Latest Events</h2>
         <NewsBannerSwiper banners={banners} height={350} />
       </motion.div>
 

@@ -3,7 +3,7 @@ import { store } from "../redux/store";
 import { refreshAccessToken } from "../redux/slices/authThunk";
 import { logout } from "../redux/slices/authSlice";
 
-const instance = axios.create({
+const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
   headers: {
@@ -11,7 +11,7 @@ const instance = axios.create({
   },
 });
 
-instance.interceptors.request.use((config) => {
+axiosInstance.interceptors.request.use((config) => {
   const state = store.getState();
   const token = state.auth.accessToken;
   if (token && typeof token === "string" && token.trim()) {
@@ -34,7 +34,8 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-instance.interceptors.response.use(
+// ---- Response interceptor ----
+axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -47,7 +48,7 @@ instance.interceptors.response.use(
         })
           .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            return instance(originalRequest);
+            return axiosInstance(originalRequest); // ✅ to‘g‘ri nom
           })
           .catch((err) => Promise.reject(err));
       }
@@ -61,7 +62,7 @@ instance.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         processQueue(null, newToken);
-        return instance(originalRequest);
+        return axiosInstance(originalRequest); // ✅ to‘g‘ri nom
       } catch (refreshError) {
         processQueue(refreshError, null);
         store.dispatch(logout());
@@ -73,6 +74,6 @@ instance.interceptors.response.use(
 
     return Promise.reject(error);
   }
-)
+);
 
-export default instance;
+export default axiosInstance;

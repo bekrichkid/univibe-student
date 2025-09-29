@@ -15,11 +15,20 @@ const gradeColors = {
 };
 
 const Sidebar = () => {
-  const user = useSelector((state) =>
-    state?.auth?.userInfo === null ? null : state?.auth?.userInfo[0]
-  );
+  const role = useSelector((state) => state?.auth?.role);
+  const userInfo = useSelector((state) => state?.auth?.userInfo);
+
+  // student uchun array, club uchun obyekt
+  const user =
+    role === "student"
+      ? userInfo && userInfo.length > 0
+        ? userInfo[0]
+        : null
+      : role === "club"
+      ? userInfo
+      : null;
+
   const [imgError, setImgError] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +40,6 @@ const Sidebar = () => {
   const gradeColor = gradeColors[gradeName] || gradeColors.Default;
 
   const handleLogoutClick = () => {
-    setIsModalOpen(true);
     document.getElementById("logout_modal").showModal();
   };
 
@@ -39,29 +47,52 @@ const Sidebar = () => {
     dispatch(logout());
     navigate("/login", { state: { from: location } });
     document.getElementById("logout_modal").close();
-    setIsModalOpen(false);
   };
 
   const handleModalClose = () => {
     document.getElementById("logout_modal").close();
-    setIsModalOpen(false);
   };
 
-  const links = [
-    { name: "Home", path: "/", icon: <FaHome className="mr-2" /> },
-    { name: "Clubs", path: "/clubs", icon: <MdGroups className="mr-2" /> },
-    {
-      name: "Shop",
-      path: "/shop",
-      icon: <FaBasketShopping className="mr-2" />,
-    },
-    {
-      name: "Rating",
-      path: "/rating",
-      icon: <MdLeaderboard className="mr-2" />,
-    },
-    { name: "Profile", path: "/profile", icon: <FaUser className="mr-2" /> },
-  ];
+  // Role bo‘yicha linklar
+  const links =
+    role === "student"
+      ? [
+          { name: "Home", path: "/", icon: <FaHome className="mr-2" /> },
+          {
+            name: "Clubs",
+            path: "/clubs",
+            icon: <MdGroups className="mr-2" />,
+          },
+          {
+            name: "Shop",
+            path: "/shop",
+            icon: <FaBasketShopping className="mr-2" />,
+          },
+          {
+            name: "Rating",
+            path: "/rating",
+            icon: <MdLeaderboard className="mr-2" />,
+          },
+          {
+            name: "Profile",
+            path: "/profile",
+            icon: <FaUser className="mr-2" />,
+          },
+        ]
+      : role === "club"
+      ? [
+          {
+            name: "Dashboard",
+            path: "/dashboard",
+            icon: <FaHome className="mr-2" />,
+          },
+          {
+            name: "Profile",
+            path: "/club-profile",
+            icon: <FaUser className="mr-2" />,
+          },
+        ]
+      : [];
 
   return (
     <aside className="h-screen bg-base-200 p-4 shadow-lg border-r border-base-300">
@@ -69,48 +100,79 @@ const Sidebar = () => {
         <div>
           {/* Avatar */}
           <div
-            onClick={() => navigate("/profile")}
-            className="flex flex-col items-center mb-4"
+            onClick={() =>
+              role === "club" ? navigate("/club-profile") : navigate("/profile")
+            }
+            className="flex flex-col items-center mb-4 cursor-pointer"
           >
-            {user?.image && !imgError ? (
-              <div className="avatar cursor-pointer">
-                <div
-                  className={`w-24 rounded-full ring ${gradeColor} ring-offset-2 ring-offset-base-100 transition-all`}
-                >
-                  <img
-                    src={
-                      user?.image
-                        ? `https://api.univibe.uz${user.image}?v=${
-                            user.image_updated_at || Date.now()
-                          }`
-                        : ""
-                    }
-                    alt={`${user?.name || "User"} ${user?.surname || ""}`}
-                    onError={() => setImgError(true)}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`avatar avatar-placeholder cursor-pointer ${gradeColor} text-neutral-content rounded-full w-24 h-24`}
-              >
-                <div className="w-full h-full text-3xl">
-                  {user?.name?.[0] || "?"}
-                </div>
-              </div>
+            {/* Student bo‘lsa */}
+            {role === "student" && (
+              <>
+                {user?.image && !imgError ? (
+                  <div className="avatar">
+                    <div
+                      className={`w-24 rounded-full ring ${gradeColor} ring-offset-2 ring-offset-base-100 transition-all`}
+                    >
+                      <img
+                        src={`https://api.univibe.uz${user.image}?v=${
+                          user.image_updated_at || Date.now()
+                        }`}
+                        alt={`${user?.name || "User"} ${user?.surname || ""}`}
+                        onError={() => setImgError(true)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className={`avatar avatar-placeholder ${gradeColor} text-neutral-content rounded-full w-24 h-24`}
+                  >
+                    <div className="w-full h-full text-3xl">
+                      {user?.name?.[0] || "?"}
+                    </div>
+                  </div>
+                )}
+                <p className="text-center text-lg font-semibold mt-2">
+                  {user?.name || "User"} <br />
+                  <span className="text-sm opacity-70">{gradeName}</span>
+                </p>
+              </>
             )}
-            <p className="text-center text-lg font-semibold mt-2">
-              {user?.name || "User"} <br />
-              <span className="text-sm opacity-70">{gradeName}</span>
-            </p>
+
+            {/* Club bo‘lsa */}
+            {role === "club" && (
+              <>
+                {user?.logo && !imgError ? (
+                  <div className="avatar">
+                    <div className="w-24 rounded-full ring ring-primary ring-offset-2 ring-offset-base-100 transition-all">
+                      <img
+                        src={`https://api.univibe.uz${user.logo}?v=${
+                          user.logo_updated_at || Date.now()
+                        }`}
+                        alt={user?.name || "Club"}
+                        onError={() => setImgError(true)}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="avatar avatar-placeholder bg-primary text-neutral-content rounded-full w-24 h-24">
+                    <div className="w-full h-full text-3xl">
+                      {user?.name?.[0] || "C"}
+                    </div>
+                  </div>
+                )}
+                <p className="text-center text-lg font-semibold mt-2">
+                  {user?.name || "Club"}
+                </p>
+              </>
+            )}
           </div>
 
           {/* Links */}
           <ul className="space-y-2 mt-5">
-            {links.map((link) => (
-              <li key={link.name} className="group">
+            {links.map((item) => (
+              <li key={item.name} className="group">
                 <NavLink
-                  to={link.path}
+                  to={item.path}
                   className={({ isActive }) =>
                     `flex items-center px-3 py-3 rounded-xl transition-all duration-200 ${
                       isActive
@@ -119,8 +181,8 @@ const Sidebar = () => {
                     }`
                   }
                 >
-                  {link.icon}
-                  <span className="ml-2">{link.name}</span>
+                  {item.icon}
+                  <span className="ml-2">{item.name}</span>
                 </NavLink>
               </li>
             ))}

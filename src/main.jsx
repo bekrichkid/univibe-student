@@ -15,10 +15,10 @@ import Rating from "./pages/Rating/Rating.jsx";
 import PrivateRoute from "./hooks/PrivateRoute.jsx";
 import QrCode from "./pages/QrCode/QrCode.jsx";
 import StudentsRaiting from "./pages/StudentsRaiting/StudentsRaiting.jsx";
-
-// toastify
+import DashboardClub from "./pages/DashboardClub/DashboardCllub.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ClubProfile from "./pages/ClubProfile/ClubProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -58,6 +58,22 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/dashboard",
+        element: (
+          <PrivateRoute>
+            <DashboardClub />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/club-profile",
+        element: (
+          <PrivateRoute>
+            <ClubProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "/users/rating",
         element: <Rating />,
       },
@@ -89,14 +105,14 @@ createRoot(document.getElementById("root")).render(
           {/* Global Toast Container */}
           <ToastContainer
             position="bottom-right"
-            autoClose={3000}       // 3 sekundda yopiladi
+            autoClose={3000} // 3 sekundda yopiladi
             hideProgressBar={false}
             newestOnTop={false}
             closeOnClick
             pauseOnFocusLoss
             draggable
             pauseOnHover
-            theme="colored"       // rangli (success - yashil, error - qizil, info - ko‘k)
+            theme="colored" // rangli (success - yashil, error - qizil, info - ko‘k)
           />
         </>
       </PersistGate>

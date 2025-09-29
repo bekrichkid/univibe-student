@@ -6,6 +6,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import axiosInstance from "../../axiosInstance/axiosInstance";
 import { toast } from "react-toastify";
+import coin from "../../assets/coin.png";
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -223,8 +224,8 @@ const Profile = () => {
         >
           {[
             {
-              icon: <Coins className="w-6 h-6 mr-3" />,
-              label: "Active Points",
+              img: <img src={coin} className="w-6 h-6 mr-3" />,
+              label: "Total Coins",
               value: profile.active_tokens?.toLocaleString(),
               color: "primary",
             },
@@ -256,7 +257,7 @@ const Profile = () => {
               transition={{ duration: 0.4 }}
               className={`flex items-center bg-${item.color}/10 text-${item.color} rounded-lg p-3`}
             >
-              {item.icon}
+              {item.img || item.icon}
               <div>
                 <p className="text-sm">{item.label}</p>
                 <p className="text-lg font-medium">{item.value}</p>
@@ -272,12 +273,7 @@ const Profile = () => {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="bg-base-100 border border-base-300 p-4 rounded-xl space-y-3"
         >
-          <div className="flex items-center">
-            <Award className="w-5 h-5 mr-2 text-warning" />
-            <p className="text-base-content text-sm">
-              O'rtacha ball: {profile.gpa || "4.2"}
-            </p>
-          </div>
+        
         </motion.div>
       </motion.div>
     </motion.div>

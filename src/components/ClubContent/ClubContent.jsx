@@ -9,10 +9,8 @@ const ClubContent = ({ clubs, loading, error, searchTerm, setSearchTerm, current
     club.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-
-  
   return (
-    <div>
+    <div> 
       <input
         type="text"
         placeholder="Search clubs..."
@@ -26,9 +24,9 @@ const ClubContent = ({ clubs, loading, error, searchTerm, setSearchTerm, current
           <ClubCard
             key={club.id}
             club={club}
-            currentUserId={currentUserId}  // ✅ user idni uzatyapmiz
+            currentUserId={currentUserId} 
             onClick={() => console.log("View club", club.id)}
-            onUpdate={onUpdate}            // ✅ follow/unfollow bo‘lganda qayta fetch
+            onUpdate={onUpdate}         
           />
         ))}
       </div>

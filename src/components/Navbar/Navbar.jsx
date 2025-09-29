@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { BsFillLightningChargeFill } from "react-icons/bs";
 import { logout } from "../../redux/slices/authSlice";
+import coin from "../../assets/coin.png";
 
 const gradeColors = {
   Freshmen: "bg-blue-500",
@@ -14,9 +14,19 @@ const gradeColors = {
 };
 
 const Navbar = ({ tokens }) => {
-  const user = useSelector((state) =>
-    state?.auth?.userInfo === null ? null : state?.auth?.userInfo[0]
-  );
+  const role = useSelector((state) => state?.auth?.role);
+  const userInfo = useSelector((state) => state?.auth?.userInfo);
+
+  // ✅ student bo‘lsa arraydan 1-chi element, club bo‘lsa obyekt
+  const user =
+    role === "student"
+      ? userInfo && userInfo.length > 0
+        ? userInfo[0]
+        : null
+      : role === "club"
+      ? userInfo
+      : null;
+
   const [imgError, setImgError] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -24,7 +34,7 @@ const Navbar = ({ tokens }) => {
   const location = useLocation();
 
   const gradeName =
-    user && user?.grade && user?.grade?.grade_name
+    role === "student" && user?.grade?.grade_name
       ? user?.grade?.grade_name
       : "Default";
   const gradeColor = gradeColors[gradeName] || gradeColors.Default;
@@ -48,22 +58,20 @@ const Navbar = ({ tokens }) => {
 
   return (
     <div className="bg-base-200 hidden md:flex navbar shadow-sm">
-      {/* Left: Search */}
       <div className="navbar-start">
         <input className="input input-md" placeholder="Search" type="text" />
       </div>
 
       <div className="navbar-center"></div>
 
-      {/* Right: Tokens & Avatar */}
       <div className="navbar-end">
-        <div className="flex items-center mr-4 border border-primary py-2 px-5 rounded">
-          <BsFillLightningChargeFill className="text-2xl text-amber-500 mr-2" />
-          <span className="text-primary">{tokens}</span>
+        <div className="flex items-center mr-4 border border-primary py-2 px-5  gap-2 rounded">
+         <img src={coin} alt="" className="w-6"/>
+          <span className="text-primary">{tokens || user?.tokens || 0}</span>
         </div>
 
         <div className="dropdown dropdown-end">
-          {user?.image && !imgError ? (
+          {user?.image || user?.logo ? (
             <div
               tabIndex={0}
               role="button"
@@ -72,16 +80,12 @@ const Navbar = ({ tokens }) => {
               <div
                 className={`w-10 rounded-full ring ${gradeColor} ring-offset-2 ring-offset-base-100 transition-all`}
               >
-                {/* ✅ Cache busting bilan – profil tahriridan keyin yangi rasm ko‘rinadi */}
+                {/* ✅ student bo‘lsa image, club bo‘lsa logo */}
                 <img
-                  src={
-                    user?.image
-                      ? `https://api.univibe.uz${user.image}?v=${
-                          user.image_updated_at || Date.now()
-                        }`
-                      : ""
-                  }
-                  alt={`${user?.name || "User"} ${user?.surname || ""}`}
+                  src={`https://api.univibe.uz${user?.image || user?.logo}?v=${
+                    user?.image_updated_at || Date.now()
+                  }`}
+                  alt={user?.name || user?.club_name || "User"}
                   onError={() => setImgError(true)}
                 />
               </div>
@@ -92,7 +96,9 @@ const Navbar = ({ tokens }) => {
               role="button"
               className={`avatar select-none avatar-placeholder cursor-pointer ${gradeColor} text-neutral-content rounded-full w-10 h-10`}
             >
-              <div className="text-xl">{user?.name?.[0] || "?"}</div>
+              <div className="text-xl">
+                {user?.name?.[0] || user?.club_name?.[0] || "?"}
+              </div>
             </div>
           )}
 
