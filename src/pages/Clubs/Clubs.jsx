@@ -211,7 +211,7 @@ export default function Clubs() {
                             {f.name?.[0] || "?"}
                           </div>
                         )}
-                        <span className="font-medium">
+                        <span className="font-medium">  
                           {f.name} {f.surname}
                         </span>
                       </li>
